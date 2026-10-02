@@ -1,0 +1,16 @@
+{
+  "name": "water-fondue-line",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "assets": {"directory": "./public", "binding": "ASSETS", "run_worker_first": ["/api/*", "/webhook/line"]},
+  "vars": {
+    "LIFF_ID": "REPLACE_WITH_LIFF_ID",
+    "LINE_LOGIN_CHANNEL_ID": "REPLACE_WITH_LOGIN_CHANNEL_ID",
+    "REPORTS_ENABLED": "false",
+    "CONTACT_TEXT": "ติดต่อผู้ดูแลโครงการ Water Fondue",
+    "STALE_MINUTES": "120",
+    "MAX_FUTURE_MINUTES": "15"
+  },
+  "observability": {"enabled": false}
+}

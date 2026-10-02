@@ -1,0 +1,25 @@
+name: Clean expired raw
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 17 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: water-fondue-production
+  cancel-in-progress: false
+jobs:
+  cleanup:
+    if: github.event_name == 'workflow_dispatch' || vars.RUN_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Delete only expired wf2 raw objects
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python run.py cleanup --profile production --apply

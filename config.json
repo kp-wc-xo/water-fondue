@@ -1,0 +1,10 @@
+{
+  "province": "64",
+  "raw_days": 7,
+  "stale_minutes": 120,
+  "max_future_minutes": 15,
+  "line_enabled": false,
+  "line_monthly_cap": 50,
+  "rules": {},
+  "source_url": "https://api-v3.thaiwater.net/api/v1/thaiwater30/provinces/waterlevel"
+}
