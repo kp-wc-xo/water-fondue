@@ -13,7 +13,7 @@ function renderWater(){if(!water)return;const age=(Date.now()-Date.parse(water.i
  for(const r of water.rows){if(!$('search').value||String(r.name).includes($('search').value)){
  const tr=document.createElement('tr'),age=(Date.now()-Date.parse(r.observed_at))/60000;
  const stale=!Number.isFinite(age)||age>water.stale_minutes||age< -water.max_future_minutes;
- for(const v of [r.name,r.level_msl??'ไม่มีค่า',fmt(r.observed_at),stale?'เก่าหรือเวลาผิดปกติ':r.level_msl==null?'ไม่มีค่าระดับน้ำ':'อยู่ในช่วงความสด']){const td=document.createElement('td');td.textContent=v;tr.append(td);}if(stale)tr.className='stale';$('waterRows').append(tr);count++;
+ for(const v of [r.name,r.level_msl??'ไม่มีค่า',fmt(r.observed_at),stale?'ยังไม่มีข้อมูลล่าสุด':r.level_msl==null?'ไม่มีค่าระดับน้ำ':'อัพเดทล่าสุด']){const td=document.createElement('td');td.textContent=v;tr.append(td);}if(stale)tr.className='stale';$('waterRows').append(tr);count++;
  }}$('waterCount').textContent=`แสดง ${count} สถานี`;}
 async function loadWater(){try{water=await api('/api/water',{auth:false});renderWater();}catch(e){message(e);$('waterStatus').textContent='อ่านข้อมูลล่าสุดไม่สำเร็จ โปรดตรวจเวลาของข้อมูลที่ค้างอยู่';}}
 $('refresh').onclick=loadWater;$('search').oninput=renderWater;setInterval(renderWater,30000);

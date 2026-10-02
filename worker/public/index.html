@@ -1,10 +1,88 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Water Fondue</title><link rel="stylesheet" href="/style.css"><script src="https://static.line-scdn.net/liff/edge/2/sdk.js" defer></script><script type="module" src="/app.js"></script></head><body><main>
-<header><span class="eyebrow">ทับผึ้ง · สุโขทัย</span><h1>Water Fondue</h1><p>ดูระดับน้ำ แจ้งปัญหา และติดตามเรื่องในชุมชน</p><p class="notice">ระบบนำร่อง ข้อมูลตรวจวัดไม่ใช่พยากรณ์หรือประกาศเตือนภัยทางการ</p></header>
-<nav aria-label="เมนูหลัก"><button data-tab="water">สถานการณ์น้ำ</button><button data-tab="report">แจ้งปัญหา</button><button data-tab="mine">รายงานของฉัน</button><button id="adminTab" data-tab="admin" hidden>เจ้าหน้าที่</button></nav>
-<p id="authStatus" role="status">กำลังเตรียมแอป</p><button id="login" hidden>เข้าสู่ระบบ LINE</button><p id="error" role="alert"></p>
-<section id="water" class="panel"><h2>ระดับน้ำล่าสุด</h2><p id="waterStatus">กำลังโหลด</p><div class="controls"><label for="search">ค้นหาสถานี</label><input id="search" placeholder="ชื่อสถานี"><button id="refresh">โหลดใหม่</button></div><p id="waterCount"></p><div class="scroll"><table><thead><tr><th>สถานี</th><th>ม.รทก.</th><th>เวลาวัด ไทย</th><th>ความสด</th></tr></thead><tbody id="waterRows"></tbody></table></div><p class="muted">แหล่งข้อมูล <a href="https://sukhothai.thaiwater.net/wl">ThaiWater</a> · งานเก็บข้อมูลเป้าหมายทุก 15 นาที · API cache สูงสุด 5 นาที · กดโหลดใหม่เพื่ออ่านข้อมูล</p></section>
-<section id="report" class="panel" hidden><h2>แจ้งปัญหาในพื้นที่</h2><p>นำร่องรับไม่เกิน 3 เรื่องต่อบัญชีต่อวัน และรวม 100 เรื่องต่อเดือน รูป 1 รูปต่อเรื่อง ไม่เกิน 100 KiB หลังย่อ</p><form id="reportForm"><label>ประเภท<select id="category"><option value="flood">น้ำท่วม</option><option value="blocked_canal">คลองอุดตัน</option><option value="gate">ประตูน้ำ</option><option value="other">อื่น ๆ</option></select></label><label>รายละเอียด<textarea id="description" minlength="10" maxlength="1000" required placeholder="ระบุจุดเกิดเหตุและสิ่งที่พบอย่างน้อย 10 ตัวอักษร"></textarea></label><button type="button" id="locate">ใช้ตำแหน่งปัจจุบัน</button><p class="muted">หากคุณไม่ได้อยู่จุดเกิดเหตุ ให้กรอกพิกัดเองหรือเว้นว่าง แล้วบอกสถานที่ในรายละเอียด</p><div class="controls"><label>ละติจูด<input id="latitude" type="number" step="any" min="-90" max="90"></label><label>ลองจิจูด<input id="longitude" type="number" step="any" min="-180" max="180"></label></div><label>รูปภาพ ไม่บังคับ<input id="photo" type="file" accept="image/*"></label><p id="photoStatus" class="muted"></p><label class="consent"><input id="consent" type="checkbox" required>ยินยอมให้ผู้ดูแลใช้ข้อมูลรายงาน พิกัด รูปภาพ และรหัสบัญชี LINE เพื่อรับเรื่องและติดตามผล ตาม <a href="/privacy.html">คำชี้แจงข้อมูลส่วนบุคคล</a></label><button id="submitReport" type="submit">ส่งรายงาน</button><p id="receipt" role="status"></p></form></section>
-<section id="mine" class="panel" hidden><h2>รายงานของฉัน</h2><button id="loadMine">โหลดรายงาน</button><div id="myReports"></div></section>
-<section id="admin" class="panel" hidden><h2>งานสำหรับเจ้าหน้าที่</h2><p>แสดง 100 เรื่องล่าสุด รายละเอียดและรูปไม่เปิดให้ผู้ใช้คนอื่น</p><button id="loadAdmin">โหลดงาน</button><div id="allReports"></div></section>
-<footer><p id="contact"></p><a href="/privacy.html">การใช้ข้อมูลส่วนบุคคล</a><p class="muted">กรณีฉุกเฉินโปรดติดต่อหน่วยงานในพื้นที่โดยตรง การส่งรายงานไม่ได้รับประกันเวลาตอบรับ</p></footer>
-</main></body></html>
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Water Fondue</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js" defer></script>
+    <script type="module" src="/app.js"></script>
+</head>
+
+<body>
+    <main>
+        <header><span class="eyebrow">ทับผึ้ง · สุโขทัย</span>
+            <h1>Water Fondue</h1>
+            <p>ดูระดับน้ำ แจ้งปัญหา และติดตามเรื่องในชุมชน</p>
+            <p class="notice">ระบบนำร่อง ข้อมูลตรวจวัดไม่ใช่พยากรณ์หรือประกาศเตือนภัยทางการ</p>
+        </header>
+        <nav aria-label="เมนูหลัก"><button data-tab="water">สถานการณ์น้ำ</button><button
+                data-tab="report">แจ้งปัญหา</button><button data-tab="mine">รายงานของฉัน</button><button id="adminTab"
+                data-tab="admin" hidden>เจ้าหน้าที่</button></nav>
+        <p id="authStatus" role="status">กำลังเตรียมแอป</p><button id="login" hidden>เข้าสู่ระบบ LINE</button>
+        <p id="error" role="alert"></p>
+        <section id="water" class="panel">
+            <h2>ระดับน้ำล่าสุด</h2>
+            <p id="waterStatus">กำลังโหลด</p>
+            <div class="controls"><label for="search">ค้นหาสถานี</label><input id="search"
+                    placeholder="ชื่อสถานี"><button id="refresh">โหลดใหม่</button></div>
+            <p id="waterCount"></p>
+            <div class="scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>สถานีตรวจวัด</th>
+                            <th>ระดับน้ำ (ม.รทก.)</th>
+                            <th>เวลาตรวจวัด (เวลาไทย)</th>
+                            <th>สถานะข้อมูล</th>
+                        </tr>
+                    </thead>
+                    <tbody id="waterRows"></tbody>
+                </table>
+            </div>
+            <p class="muted">แหล่งข้อมูล <a href="https://sukhothai.thaiwater.net/wl">ThaiWater</a> ·
+                งานเก็บข้อมูลเป้าหมายทุก 15 นาที · API cache สูงสุด 5 นาที · กดโหลดใหม่เพื่ออ่านข้อมูล</p>
+        </section>
+        <section id="report" class="panel" hidden>
+            <h2>แจ้งปัญหาในพื้นที่</h2>
+            <p>นำร่องรับไม่เกิน 3 เรื่องต่อบัญชีต่อวัน และรวม 100 เรื่องต่อเดือน รูป 1 รูปต่อเรื่อง ไม่เกิน 100 KiB
+                หลังย่อ</p>
+            <form id="reportForm"><label>ประเภท<select id="category">
+                        <option value="flood">น้ำท่วม</option>
+                        <option value="blocked_canal">คลองอุดตัน</option>
+                        <option value="gate">ประตูน้ำ</option>
+                        <option value="other">อื่น ๆ</option>
+                    </select></label><label>รายละเอียด<textarea id="description" minlength="10" maxlength="1000"
+                        required
+                        placeholder="ระบุจุดเกิดเหตุและสิ่งที่พบอย่างน้อย 10 ตัวอักษร"></textarea></label><button
+                    type="button" id="locate">ใช้ตำแหน่งปัจจุบัน</button>
+                <p class="muted">หากคุณไม่ได้อยู่จุดเกิดเหตุ ให้กรอกพิกัดเองหรือเว้นว่าง แล้วบอกสถานที่ในรายละเอียด</p>
+                <div class="controls"><label>ละติจูด<input id="latitude" type="number" step="any" min="-90"
+                            max="90"></label><label>ลองจิจูด<input id="longitude" type="number" step="any" min="-180"
+                            max="180"></label></div><label>รูปภาพ ไม่บังคับ<input id="photo" type="file"
+                        accept="image/*"></label>
+                <p id="photoStatus" class="muted"></p><label class="consent"><input id="consent" type="checkbox"
+                        required>ยินยอมให้ผู้ดูแลใช้ข้อมูลรายงาน พิกัด รูปภาพ และรหัสบัญชี LINE
+                    เพื่อรับเรื่องและติดตามผล ตาม <a href="/privacy.html">คำชี้แจงข้อมูลส่วนบุคคล</a></label><button
+                    id="submitReport" type="submit">ส่งรายงาน</button>
+                <p id="receipt" role="status"></p>
+            </form>
+        </section>
+        <section id="mine" class="panel" hidden>
+            <h2>รายงานของฉัน</h2><button id="loadMine">โหลดรายงาน</button>
+            <div id="myReports"></div>
+        </section>
+        <section id="admin" class="panel" hidden>
+            <h2>งานสำหรับเจ้าหน้าที่</h2>
+            <p>แสดง 100 เรื่องล่าสุด รายละเอียดและรูปไม่เปิดให้ผู้ใช้คนอื่น</p><button id="loadAdmin">โหลดงาน</button>
+            <div id="allReports"></div>
+        </section>
+        <footer>
+            <p id="contact"></p><a href="/privacy.html">การใช้ข้อมูลส่วนบุคคล</a>
+            <p class="muted">กรณีฉุกเฉินโปรดติดต่อหน่วยงานในพื้นที่โดยตรง การส่งรายงานไม่ได้รับประกันเวลาตอบรับ</p>
+        </footer>
+    </main>
+</body>
+
+</html>
